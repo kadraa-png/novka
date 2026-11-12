@@ -13,8 +13,9 @@ where money goes through graphs, monthly totals and budgets.
 It is built for the owner's own phone first, to a standard fit for publishing
 on the Play Store later.
 
-Working name: **Ledger** (package `com.kadraa.ledger`). The name can change
-before publishing without affecting the design.
+Name: **Novka** (package `com.kadraa.novka`), from the Bosnian *novac*,
+"money". A web search found no finance app using the name; a Play Store and
+trademark search is still needed before publishing.
 
 ### Success criteria
 
