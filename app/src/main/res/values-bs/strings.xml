@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Common -->
+    <string name="ok">U redu</string>
+    <string name="cancel">Odustani</string>
+    <string name="save">Sačuvaj</string>
+    <string name="delete">Obriši</string>
+    <string name="clear">Očisti</string>
+    <string name="back">Nazad</string>
+    <string name="next">Dalje</string>
+    <string name="finish">Započni</string>
+    <string name="search">Pretraga</string>
+    <string name="none">Ništa</string>
+    <string name="other">Ostalo</string>
+    <string name="manage">Uredi</string>
+    <string name="see_all">Prikaži sve</string>
+    <string name="undo">Poništi</string>
+    <string name="open_settings">Otvori postavke</string>
+    <string name="turn_off">Isključi</string>
+    <string name="not_built_yet">Ovaj ekran još nije napravljen.</string>
+
+    <!-- Navigation -->
+    <string name="tab_home">Početna</string>
+    <string name="tab_transactions">Transakcije</string>
+    <string name="tab_insights">Pregled</string>
+    <string name="tab_budgets">Budžeti</string>
+    <string name="tab_more">Više</string>
+
+    <!-- Money words -->
+    <string name="expense">Trošak</string>
+    <string name="income">Prihod</string>
+    <string name="transfer">Prenos</string>
+    <string name="payment">Plaćanje</string>
+    <string name="cash">Gotovina</string>
+    <string name="category">Kategorija</string>
+    <string name="currency">Valuta</string>
+    <string name="uncategorised">Bez kategorije</string>
+    <string name="accounts">Računi</string>
+    <string name="spent">Potrošeno</string>
+    <string name="earned">Zarađeno</string>
+    <string name="net">Razlika</string>
+
+    <!-- Home -->
+    <string name="total_balance">Ukupno stanje</string>
+    <string name="this_month">Ovaj mjesec</string>
+    <string name="upcoming">Uskoro</string>
+    <string name="recent">Nedavno</string>
+    <string name="no_transactions">Još nema transakcija</string>
+    <string name="add_transaction">Dodaj transakciju</string>
+    <string name="needs_review">Treba pregledati</string>
+    <string name="needs_review_count">Za pregled: %1$d</string>
+    <string name="awaiting_confirmation">Čeka potvrdu</string>
+    <string name="rates_missing">Kursevi valuta još nisu preuzeti</string>
+    <string name="rates_age">Kursevi valuta su stari %1$d dana</string>
+    <string name="capture_off_title">Automatsko bilježenje je isključeno</string>
+    <string name="capture_off_text">Novka treba pristup obavještenjima da bi sama bilježila plaćanja karticom.</string>
+
+    <!-- Transactions -->
+    <string name="all_accounts">Svi računi</string>
+    <string name="no_results">Ništa ne odgovara ovim filterima</string>
+    <string name="clear_filters">Ukloni filtere</string>
+    <string name="transaction_deleted">Transakcija je obrisana</string>
+
+    <!-- Editor -->
+    <string name="new_transaction">Nova transakcija</string>
+    <string name="edit_transaction">Uredi transakciju</string>
+    <string name="amount">Iznos</string>
+    <string name="amount_received">Primljeni iznos</string>
+    <string name="account">Račun</string>
+    <string name="from_account">Sa računa</string>
+    <string name="to_account">Na račun</string>
+    <string name="merchant">Trgovac ili platilac</string>
+    <string name="note">Bilješka</string>
+    <string name="date">Datum</string>
+    <string name="split_merged">Ovo su bila dva plaćanja</string>
+
+    <!-- Lock -->
+    <string name="unlock_title">Unesite PIN za nastavak</string>
+    <string name="unlock">Otključaj</string>
+    <string name="pin">PIN</string>
+    <string name="wrong_pin">Pogrešan PIN</string>
+    <string name="use_pin">Koristi PIN</string>
+    <string name="use_biometrics">Koristi otisak ili lice</string>
+
+    <!-- Onboarding -->
+    <string name="welcome_title">Dobro došli u Novku</string>
+    <string name="welcome_text">Pratite koliko trošite i zarađujete. Sve ostaje na ovom telefonu.</string>
+    <string name="main_currency">Glavna valuta</string>
+    <string name="main_currency_hint">Ukupni iznosi i budžeti prikazuju se u ovoj valuti.</string>
+    <string name="first_account_title">Vaš prvi račun</string>
+    <string name="first_account_text">Počnite s onim koji najviše koristite. Ostale možete dodati kasnije.</string>
+    <string name="account_name">Naziv</string>
+    <string name="type_cash">Gotovina</string>
+    <string name="type_bank">Banka</string>
+    <string name="type_card">Kartica</string>
+    <string name="type_savings">Štednja</string>
+    <string name="opening_balance">Trenutno stanje</string>
+    <string name="capture_title">Automatski bilježi plaćanja karticom</string>
+    <string name="capture_disclosure">Uz pristup obavještenjima Novka čita obavještenja o plaćanju iz Google Walleta i Raiffeisena i čuva ih kao transakcije. Obavještenja se čitaju samo na ovom telefonu i nikada se nikuda ne šalju. Ovo možete preskočiti i uključiti kasnije.</string>
+    <string name="capture_allow">Dozvoli pristup obavještenjima</string>
+    <string name="capture_enabled">Pristup obavještenjima je uključen</string>
+
+    <!-- More -->
+    <string name="theme">Tema</string>
+    <string name="theme_system">Sistemska</string>
+    <string name="theme_light">Svijetla</string>
+    <string name="theme_dark">Tamna</string>
+    <string name="categories">Kategorije</string>
+    <string name="recurring">Ponavljajuće</string>
+    <string name="goals">Ciljevi štednje</string>
+    <string name="debts">Dugovi i pozajmice</string>
+    <string name="capture">Automatsko bilježenje</string>
+    <string name="currencies">Valute</string>
+    <string name="security">Sigurnost</string>
+    <string name="backup">Sigurnosna kopija i izvoz</string>
+    <string name="privacy">Privatnost</string>
+
+    <!-- Notifications and widget -->
+    <string name="channel_review">Plaćanja za pregled</string>
+    <string name="channel_budgets">Upozorenja o budžetu</string>
+    <string name="prompt_guess">Izgleda kao %1$s. Dodirnite za izmjenu.</string>
+    <string name="prompt_pick">Odaberite kategoriju</string>
+    <string name="budget_alert_over">Budžet za %1$s je potrošen</string>
+    <string name="budget_alert_near">Budžet za %1$s je skoro potrošen</string>
+    <string name="budget_alert_text">Potrošeno %1$s od %2$s</string>
+    <string name="widget_description">Ukupno stanje i potrošnja ovog mjeseca</string>
+    <string name="widget_spent">Potrošeno ovaj mjesec: %1$s</string>
+</resources>

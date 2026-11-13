@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Novka</string>
+
+    <!-- Common -->
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="delete">Delete</string>
+    <string name="clear">Clear</string>
+    <string name="back">Back</string>
+    <string name="next">Next</string>
+    <string name="finish">Get started</string>
+    <string name="search">Search</string>
+    <string name="none">None</string>
+    <string name="other">Other</string>
+    <string name="manage">Manage</string>
+    <string name="see_all">See all</string>
+    <string name="undo">Undo</string>
+    <string name="open_settings">Open settings</string>
+    <string name="turn_off">Turn off</string>
+    <string name="not_built_yet">This screen is not built yet.</string>
+
+    <!-- Navigation -->
+    <string name="tab_home">Home</string>
+    <string name="tab_transactions">Transactions</string>
+    <string name="tab_insights">Insights</string>
+    <string name="tab_budgets">Budgets</string>
+    <string name="tab_more">More</string>
+
+    <!-- Money words -->
+    <string name="expense">Expense</string>
+    <string name="income">Income</string>
+    <string name="transfer">Transfer</string>
+    <string name="payment">Payment</string>
+    <string name="cash">Cash</string>
+    <string name="category">Category</string>
+    <string name="currency">Currency</string>
+    <string name="uncategorised">Uncategorised</string>
+    <string name="accounts">Accounts</string>
+    <string name="spent">Spent</string>
+    <string name="earned">Earned</string>
+    <string name="net">Net</string>
+
+    <!-- Home -->
+    <string name="total_balance">Total balance</string>
+    <string name="this_month">This month</string>
+    <string name="upcoming">Upcoming</string>
+    <string name="recent">Recent</string>
+    <string name="no_transactions">No transactions yet</string>
+    <string name="add_transaction">Add transaction</string>
+    <string name="needs_review">Needs review</string>
+    <string name="needs_review_count">%1$d to review</string>
+    <string name="awaiting_confirmation">Awaiting confirmation</string>
+    <string name="rates_missing">Exchange rates have not been downloaded yet</string>
+    <string name="rates_age">Exchange rates are %1$d days old</string>
+    <string name="capture_off_title">Automatic capture is off</string>
+    <string name="capture_off_text">Novka needs notification access to record card payments for you.</string>
+
+    <!-- Transactions -->
+    <string name="all_accounts">All accounts</string>
+    <string name="no_results">Nothing matches these filters</string>
+    <string name="clear_filters">Clear filters</string>
+    <string name="transaction_deleted">Transaction deleted</string>
+
+    <!-- Editor -->
+    <string name="new_transaction">New transaction</string>
+    <string name="edit_transaction">Edit transaction</string>
+    <string name="amount">Amount</string>
+    <string name="amount_received">Amount received</string>
+    <string name="account">Account</string>
+    <string name="from_account">From</string>
+    <string name="to_account">To</string>
+    <string name="merchant">Merchant or payer</string>
+    <string name="note">Note</string>
+    <string name="date">Date</string>
+    <string name="split_merged">These were two payments</string>
+
+    <!-- Lock -->
+    <string name="unlock_title">Enter your PIN to continue</string>
+    <string name="unlock">Unlock</string>
+    <string name="pin">PIN</string>
+    <string name="wrong_pin">Wrong PIN</string>
+    <string name="use_pin">Use PIN</string>
+    <string name="use_biometrics">Use fingerprint or face</string>
+
+    <!-- Onboarding -->
+    <string name="welcome_title">Welcome to Novka</string>
+    <string name="welcome_text">Track what you spend and earn. Everything stays on this phone.</string>
+    <string name="main_currency">Main currency</string>
+    <string name="main_currency_hint">Totals and budgets are shown in this currency.</string>
+    <string name="first_account_title">Your first account</string>
+    <string name="first_account_text">Start with the one you use most. You can add more later.</string>
+    <string name="account_name">Name</string>
+    <string name="type_cash">Cash</string>
+    <string name="type_bank">Bank</string>
+    <string name="type_card">Card</string>
+    <string name="type_savings">Savings</string>
+    <string name="opening_balance">Current balance</string>
+    <string name="capture_title">Record card payments automatically</string>
+    <string name="capture_disclosure">With notification access, Novka reads payment notifications from Google Wallet and Raiffeisen and saves them as transactions. Notifications are read on this phone only and are never sent anywhere. You can skip this and turn it on later.</string>
+    <string name="capture_allow">Allow notification access</string>
+    <string name="capture_enabled">Notification access is on</string>
+
+    <!-- More -->
+    <string name="theme">Theme</string>
+    <string name="theme_system">System</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="categories">Categories</string>
+    <string name="recurring">Recurring</string>
+    <string name="goals">Savings goals</string>
+    <string name="debts">Debts and loans</string>
+    <string name="capture">Automatic capture</string>
+    <string name="currencies">Currencies</string>
+    <string name="security">Security</string>
+    <string name="backup">Backup and export</string>
+    <string name="privacy">Privacy</string>
+
+    <!-- Notifications and widget -->
+    <string name="channel_review">Payments to review</string>
+    <string name="channel_budgets">Budget alerts</string>
+    <string name="prompt_guess">Looks like %1$s. Tap to change.</string>
+    <string name="prompt_pick">Pick a category</string>
+    <string name="budget_alert_over">%1$s budget is used up</string>
+    <string name="budget_alert_near">%1$s budget is almost used up</string>
+    <string name="budget_alert_text">%1$s of %2$s spent</string>
+    <string name="widget_description">Total balance and this month\'s spending</string>
+    <string name="widget_spent">Spent this month: %1$s</string>
+</resources>
