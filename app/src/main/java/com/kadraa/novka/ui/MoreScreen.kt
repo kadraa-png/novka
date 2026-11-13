@@ -9,14 +9,18 @@ import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.OpenInNew
 import androidx.compose.material.icons.rounded.AccountBalanceWallet
 import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.ChevronRight
+import androidx.compose.material.icons.rounded.Code
+import androidx.compose.material.icons.rounded.Coffee
 import androidx.compose.material.icons.rounded.CurrencyExchange
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Handshake
+import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.PrivacyTip
@@ -30,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.kadraa.novka.R
@@ -52,6 +57,12 @@ private val settingsLinks = listOf(
     MoreLink("privacy", R.string.privacy, Icons.Rounded.PrivacyTip),
 )
 
+private val aboutLinks = listOf(
+    MoreLink("https://github.com/kadraa-png", R.string.about_github, Icons.Rounded.Code),
+    MoreLink("https://kadraa.space", R.string.about_website, Icons.Rounded.Language),
+    MoreLink("https://ko-fi.com/kadraa", R.string.about_coffee, Icons.Rounded.Coffee),
+)
+
 @Composable
 fun MoreScreen(data: AppData, vm: MainViewModel, nav: NavHostController) {
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
@@ -66,21 +77,33 @@ fun MoreScreen(data: AppData, vm: MainViewModel, nav: NavHostController) {
                 themes.map { (value, label) -> value to t(label) }, data.settings.theme,
                 { value -> vm.run { settings.update { it.copy(theme = value) } } }, Modifier.padding(horizontal = 16.dp),
             )
+
+            SectionTitle(t(R.string.about), Modifier.padding(horizontal = 16.dp))
+            val uriHandler = LocalUriHandler.current
+            LinkGroup(aboutLinks, Icons.AutoMirrored.Rounded.OpenInNew) { url ->
+                // No browser installed: nothing to open.
+                runCatching { uriHandler.openUri(url) }
+            }
         }
     }
 }
 
 @Composable
 private fun LinkGroup(links: List<MoreLink>, nav: NavHostController, modifier: Modifier = Modifier) {
+    LinkGroup(links, Icons.Rounded.ChevronRight, modifier) { nav.navigate(it) }
+}
+
+@Composable
+private fun LinkGroup(links: List<MoreLink>, trailing: ImageVector, modifier: Modifier = Modifier, onClick: (String) -> Unit) {
     SectionCard(modifier) {
         Column {
             links.forEach { link ->
                 ListItem(
                     headlineContent = { Text(t(link.label)) },
                     leadingContent = { Icon(link.icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant) },
-                    trailingContent = { Icon(Icons.Rounded.ChevronRight, null) },
+                    trailingContent = { Icon(trailing, null) },
                     colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                    modifier = Modifier.clickable { nav.navigate(link.route) },
+                    modifier = Modifier.clickable { onClick(link.route) },
                 )
             }
         }

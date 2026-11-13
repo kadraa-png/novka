@@ -103,6 +103,10 @@
     <string name="theme_system">Sistemska</string>
     <string name="theme_light">Svijetla</string>
     <string name="theme_dark">Tamna</string>
+    <string name="about">O aplikaciji</string>
+    <string name="about_github">GitHub</string>
+    <string name="about_website">Web stranica</string>
+    <string name="about_coffee">Časti me kafom</string>
     <string name="categories">Kategorije</string>
     <string name="recurring">Ponavljajuće</string>
     <string name="goals">Ciljevi štednje</string>
