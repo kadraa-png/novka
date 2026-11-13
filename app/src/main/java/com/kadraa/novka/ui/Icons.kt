@@ -11,6 +11,7 @@ import com.kadraa.novka.domain.AccountType
  * Keys are never shown to the user; removing one makes its rows fall back to the generic icon.
  */
 val categoryIcons: Map<String, ImageVector> = linkedMapOf(
+    "category" to Icons.Rounded.Category,
     // Food
     "restaurant" to Icons.Rounded.Restaurant,
     "shopping_cart" to Icons.Rounded.ShoppingCart,

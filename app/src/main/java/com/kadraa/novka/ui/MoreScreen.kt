@@ -1,12 +1,9 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
-
 package com.kadraa.novka.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -17,21 +14,16 @@ import androidx.compose.material.icons.rounded.Autorenew
 import androidx.compose.material.icons.rounded.Backup
 import androidx.compose.material.icons.rounded.Category
 import androidx.compose.material.icons.rounded.ChevronRight
-import androidx.compose.material.icons.rounded.Construction
 import androidx.compose.material.icons.rounded.CurrencyExchange
 import androidx.compose.material.icons.rounded.Flag
 import androidx.compose.material.icons.rounded.Handshake
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.NotificationsActive
 import androidx.compose.material.icons.rounded.PrivacyTip
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -70,14 +62,10 @@ fun MoreScreen(data: AppData, vm: MainViewModel, nav: NavHostController) {
 
             SectionTitle(t(R.string.theme), Modifier.padding(horizontal = 16.dp))
             val themes = listOf("system" to R.string.theme_system, "light" to R.string.theme_light, "dark" to R.string.theme_dark)
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-                themes.forEachIndexed { index, (value, label) ->
-                    SegmentedButton(
-                        selected = data.settings.theme == value, onClick = { vm.run { settings.update { it.copy(theme = value) } } },
-                        shape = SegmentedButtonDefaults.itemShape(index, themes.size),
-                    ) { Text(t(label), maxLines = 1) }
-                }
-            }
+            Segmented(
+                themes.map { (value, label) -> value to t(label) }, data.settings.theme,
+                { value -> vm.run { settings.update { it.copy(theme = value) } } }, Modifier.padding(horizontal = 16.dp),
+            )
         }
     }
 }
@@ -98,30 +86,3 @@ private fun LinkGroup(links: List<MoreLink>, nav: NavHostController, modifier: M
         }
     }
 }
-
-// ---- Screens that are not written yet. Each is replaced by its real file when built. ----
-
-@Composable
-private fun NotBuilt(title: Int, onBack: () -> Unit) {
-    SubScreen(t(title), onBack) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) { EmptyState(t(R.string.not_built_yet), Icons.Rounded.Construction) }
-    }
-}
-
-@Composable
-private fun NotBuiltTab() {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { EmptyState(t(R.string.not_built_yet), Icons.Rounded.Construction) }
-}
-
-@Composable fun InsightsScreen(data: AppData, vm: MainViewModel, nav: NavHostController) = NotBuiltTab()
-@Composable fun BudgetsScreen(data: AppData, vm: MainViewModel) = NotBuiltTab()
-@Composable fun AccountsScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.accounts, onBack)
-@Composable fun CategoriesScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.categories, onBack)
-@Composable fun RecurringScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.recurring, onBack)
-@Composable fun CaptureScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.capture, onBack)
-@Composable fun CurrenciesScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.currencies, onBack)
-@Composable fun SecurityScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.security, onBack)
-@Composable fun BackupScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.backup, onBack)
-@Composable fun GoalsScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.goals, onBack)
-@Composable fun DebtsScreen(data: AppData, vm: MainViewModel, onBack: () -> Unit) = NotBuilt(R.string.debts, onBack)
-@Composable fun PrivacyScreen(onBack: () -> Unit) = NotBuilt(R.string.privacy, onBack)

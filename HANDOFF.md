@@ -4,89 +4,56 @@ Written 2026-11-12, part-way through the first build of the app.
 
 ## Where things stand
 
-The project **does not compile right now**. `MainActivity.kt` refers to screens that
-have not been written, and there are no string resources yet. Nothing has been
-installed on a phone.
+Updated 2026-11-13. The app builds, all screens exist, and it runs on the owner's
+phone with their real data. The 38 domain unit tests pass. The owner tapped through
+every screen on the phone and reported that everything works; nothing else has been
+tested on a device, and there are no UI tests.
 
-The last successful build was before the UI work started: the 38 domain unit tests in
-`app/src/test/.../DomainTest.kt` all passed. Two things have changed since then without
-a test run, because the build is broken: the test fixtures were edited to replace real
-card digits with made-up ones, and the default category colours changed.
+| Area | Files |
+|---|---|
+| Domain logic | `domain/*.kt` (unit-tested) |
+| Database, repository, settings, backup, rates | `data/*.kt` |
+| Notification capture | `capture/*.kt` |
+| Background jobs, widget | `work/Workers.kt`, `widget/BalanceWidget.kt` |
+| App shell, lock screen, navigation | `NovkaApp.kt`, `ui/MainActivity.kt` |
+| Shared UI pieces | `ui/Theme.kt`, `ui/Common.kt`, `ui/Icons.kt`, `ui/Charts.kt` |
+| Onboarding | `ui/Onboarding.kt` |
+| Tabs | `ui/HomeScreen.kt`, `ui/TransactionsScreen.kt`, `ui/InsightsScreen.kt`, `ui/BudgetsScreen.kt`, `ui/MoreScreen.kt` |
+| Add and edit sheet | `ui/TxEditor.kt` |
+| Accounts, categories, recurring, goals, debts | `ui/ManageScreens.kt` |
+| Capture, currencies, security, backup, privacy | `ui/SettingsScreens.kt` |
+| Strings | `res/values/strings.xml` (English), `res/values-bs/strings.xml` (Bosnian) |
 
-Update 2026-11-13: the existing UI was redesigned to Material Design 3 (see "Design
-rules" below). With throwaway stubs for the missing screens and placeholder strings,
-`:app:compileDebugKotlin` and `:app:testDebugUnitTest` both passed, so Room, the
-repository and everything else under "Written" now compile. The stubs were deleted
-again; the project still does not build until the screens and strings exist. Nothing
-has been looked at on a device.
+### Still owed
 
-### Written
+1. **Tests:** `BackupCodec` round trip and wrong password; Room DAO and migration
+   tests; Compose UI tests.
+2. **Device check of the parsers.** See "Notification formats" below.
+3. **Not exercised on a device:** backup and restore, CSV export and import, changing
+   the main currency, recurring rules falling due, budget alerts.
+4. **Onboarding has no PIN step.** The PIN is set under More, Security.
+5. **The transactions list filters** by type, account, category and "needs review".
+   `TxFilter` also has date and source fields; the list honours them (Insights sets
+   the dates) but has no controls for them.
+6. **Deleting a category** always uncategorises its transactions. The repository can
+   also reassign or archive (`removeCategory`), but the screen does not offer it.
+7. **Spec update** and a **privacy policy document** for the repository. The in-app
+   text is `privacy_text` in the strings files.
 
-| Area | Files | State |
-|---|---|---|
-| Domain logic | `domain/*.kt` | Complete, unit-tested |
-| Database | `data/Entities.kt`, `data/Db.kt` | Complete, never compiled by Room |
-| Repository | `data/Repository.kt` | Complete, never compiled |
-| Settings, PIN | `data/Settings.kt` | Complete, never compiled |
-| Backup codec | `data/Backup.kt` | Complete, no tests yet |
-| Exchange rates | `data/Rates.kt` | Complete; both services answered a manual request |
-| Notification capture | `capture/*.kt` | Complete, never run on a device |
-| Background jobs | `work/Workers.kt` | Complete |
-| Home-screen widget | `widget/BalanceWidget.kt`, `res/layout`, `res/xml` | Complete |
-| App shell | `NovkaApp.kt`, `ui/MainActivity.kt` (activity, lock screen, navigation) | Complete |
-| UI shared pieces | `ui/Theme.kt`, `ui/Common.kt`, `ui/Charts.kt`, `ui/MainViewModel.kt` | Complete |
-| Home screen | `ui/HomeScreen.kt` | Complete |
-| Manifest, icons, themes | `AndroidManifest.xml`, `res/` | Complete |
+## Installing on the owner's phone
 
-"Never compiled" means exactly that: expect a round of compiler errors in these files
-the first time the build gets that far.
+The phone holds real data and has the app lock on. Rules that keep it safe:
 
-### Not written
-
-1. **String resources.** `res/values/strings.xml` (English) and
-   `res/values-bs/strings.xml` (Bosnian) do not exist. The code already uses 59 string
-   names. List them with:
-
-   ```sh
-   grep -rhoE "R\.string\.[a-z_0-9]+" app/src/main/java | sort -u
-   grep -rhoE "@string/[a-z_0-9]+" app/src/main | sort -u
-   ```
-
-   Strings with arguments so far: `prompt_guess` (1), `budget_alert_over` (1),
-   `budget_alert_near` (1), `budget_alert_text` (2), `widget_spent` (1),
-   `rates_age` (1, a number of days), `needs_review_count` (1, a count).
-
-2. **Screens.** These composables are called from `ui/MainActivity.kt` and do not
-   exist. Signatures are fixed by the call sites in `AppScaffold`.
-
-   | Composable | What it must do |
-   |---|---|
-   | `Onboarding(vm)` | Main currency, first account and balance, notification-access disclosure, optional PIN. Ends with `repo.completeOnboarding(...)` |
-   | `TransactionsScreen(data, vm)` | History by day, search, filters from `vm.filter` (`TxFilter`), swipe to delete with undo via `vm.deleteWithUndo` |
-   | `TxEditorSheet(editing, data, vm)` | Bottom sheet for add and edit: expense, income, transfer. Saves a `TxDraft` through `repo.saveTx`. Needs "these were two payments" (`repo.splitMerged`) for merged captures |
-   | `InsightsScreen(data, vm, nav)` | Period switcher; `EarnedSpentChart`, `Donut` and `BalanceChart` from `Charts.kt`; comparison with previous period |
-   | `BudgetsScreen(data, vm)` | Uses `budgetLines()` and `BudgetProgress` from `HomeScreen.kt`; add, edit, delete |
-   | `MoreScreen(data, vm, nav)` | Menu to the screens below, plus theme choice |
-   | `AccountsScreen`, `CategoriesScreen`, `RecurringScreen` | Lists with add, edit, delete. Deleting uses `repo.removeAccount` / `repo.removeCategory` (reassign or archive) |
-   | `CaptureScreen` | Source switches, prompt mode, card-to-account mapping, "Couldn't read" list, debug list of `data.captured` |
-   | `CurrenciesScreen` | Main currency (`repo.changeMainCurrency`), refresh rates, manual rate (`repo.setManualRate`) |
-   | `SecurityScreen` | Lock on/off, PIN (`settings.setPin`), biometrics, lock delay, hide amount on lock screen |
-   | `BackupScreen` | Backup and restore with `BackupCodec` and `repo.snapshot` / `repo.restore`; CSV export (`repo.exportCsv`); CSV import (`CsvImporter` then `repo.importRows`) |
-   | `GoalsScreen`, `DebtsScreen` | Savings goals and debts; tables and DAO methods exist |
-   | `PrivacyScreen(onBack)` | Privacy policy text |
-
-   The last six take `(data, vm, onBack)`.
-
-3. **Tests still owed:** `BackupCodec` round trip and wrong password; Room DAO and
-   migration tests; Compose UI tests.
-
-4. **Device check of the parsers.** See "Notification formats" below.
-
-5. **Spec update.** The spec predates the decisions listed under "Changes from the
-   spec" and has not been edited to match.
-
-6. **Privacy policy** document for the repository (the spec requires one for Play
-   Store submission).
+- Install with `adb install -r` only. Never uninstall: that deletes the data.
+- Install the **release** build. It is shrunk and optimised, and is signed with the
+  debug key (`~/.android/debug.keystore`) so it updates in place. Debug builds feel
+  slow. If that keystore is lost, the app can no longer be updated without an
+  uninstall; replace the signing setup before publishing anywhere.
+- The release build is not debuggable, so `adb run-as` cannot read its data. The
+  in-app Backup screen is the way to get a copy.
+- Xiaomi shows an "Install via USB" prompt on the phone that must be tapped.
+- After installing, `adb shell cmd package compile -m speed -f com.kadraa.novka`
+  precompiles the app.
 
 ## Building
 
@@ -105,8 +72,12 @@ installed under the home folder:
 export JAVA_HOME=~/Android/jdk-17
 ./gradlew :app:testDebugUnitTest      # domain unit tests
 ./gradlew :app:assembleDebug          # debug APK in app/build/outputs/apk/debug
-./gradlew :app:installDebug           # install on a phone connected over USB
+./gradlew :app:assembleRelease --max-workers=1   # optimised APK in app/build/outputs/apk/release
 ```
+
+Run one Kotlin compile at a time (`--max-workers=1`, and not debug and release in the
+same command): two at once run out of memory here. The release build takes about
+13 minutes because of R8.
 
 On a new machine: install any JDK 17, install the Android command-line tools, then
 `sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"`.

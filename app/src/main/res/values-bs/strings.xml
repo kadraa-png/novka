@@ -17,7 +17,6 @@
     <string name="undo">Poništi</string>
     <string name="open_settings">Otvori postavke</string>
     <string name="turn_off">Isključi</string>
-    <string name="not_built_yet">Ovaj ekran još nije napravljen.</string>
 
     <!-- Navigation -->
     <string name="tab_home">Početna</string>
@@ -65,7 +64,6 @@
     <string name="new_transaction">Nova transakcija</string>
     <string name="edit_transaction">Uredi transakciju</string>
     <string name="amount">Iznos</string>
-    <string name="amount_received">Primljeni iznos</string>
     <string name="account">Račun</string>
     <string name="from_account">Sa računa</string>
     <string name="to_account">Na račun</string>
@@ -125,4 +123,148 @@
     <string name="budget_alert_text">Potrošeno %1$s od %2$s</string>
     <string name="widget_description">Ukupno stanje i potrošnja ovog mjeseca</string>
     <string name="widget_spent">Potrošeno ovaj mjesec: %1$s</string>
+
+    <!-- Insights -->
+    <string name="period_week">Sedmica</string>
+    <string name="period_month">Mjesec</string>
+    <string name="period_year">Godina</string>
+    <string name="previous">Prethodno</string>
+    <string name="previous_period">Prethodni period: potrošeno %1$s, zarađeno %2$s</string>
+    <string name="nothing_in_period">U ovom periodu nema ničega</string>
+    <string name="earned_and_spent">Zarađeno i potrošeno</string>
+    <string name="spending_by_category">Potrošnja po kategorijama</string>
+
+    <!-- Budgets -->
+    <string name="budgets_text">Mjesečni limit za kategoriju i sve unutar nje.</string>
+    <string name="no_budgets">Još nema budžeta</string>
+    <string name="add_budget">Dodaj budžet</string>
+    <string name="edit_budget">Uredi budžet</string>
+    <string name="monthly_limit">Mjesečni limit</string>
+    <string name="budget_left">Preostalo %1$s · %2$s dnevno</string>
+    <string name="budget_over">%1$s preko limita</string>
+
+    <!-- Accounts -->
+    <string name="add_account">Dodaj račun</string>
+    <string name="edit_account">Uredi račun</string>
+    <string name="no_accounts">Još nema računa</string>
+    <string name="archived">Arhiviran</string>
+    <string name="starting_balance">Početno stanje</string>
+    <string name="delete_account_title">Obrisati %1$s?</string>
+    <string name="delete_account_text">Račun s transakcijama se arhivira, pa njegova historija ostaje. Prazan račun se uklanja.</string>
+
+    <!-- Categories -->
+    <string name="add_category">Dodaj kategoriju</string>
+    <string name="edit_category">Uredi kategoriju</string>
+    <string name="category_name">Naziv</string>
+    <string name="parent_category">Grupa</string>
+    <string name="no_parent">Bez grupe</string>
+    <string name="delete_category_title">Obrisati %1$s?</string>
+    <string name="delete_category_text">Njene transakcije ostaju bez kategorije, a njen budžet se uklanja.</string>
+
+    <!-- Recurring -->
+    <string name="add_recurring">Dodaj ponavljanje</string>
+    <string name="edit_recurring">Uredi ponavljanje</string>
+    <string name="no_recurring">Još nema ponavljajućih transakcija</string>
+    <string name="freq_daily">Dnevno</string>
+    <string name="freq_weekly">Sedmično</string>
+    <string name="freq_monthly">Mjesečno</string>
+    <string name="freq_yearly">Godišnje</string>
+    <string name="every">Svakih</string>
+    <string name="repeats">Ponavlja se</string>
+    <string name="starts">Počinje</string>
+    <string name="next_date">Sljedeće</string>
+    <string name="ends">Završava</string>
+    <string name="next_on">sljedeće %1$s</string>
+    <string name="paused">Pauzirano</string>
+    <string name="active">Aktivno</string>
+
+    <!-- Goals -->
+    <string name="add_goal">Dodaj cilj</string>
+    <string name="edit_goal">Uredi cilj</string>
+    <string name="no_goals">Još nema ciljeva štednje</string>
+    <string name="goal_name">Naziv</string>
+    <string name="goal_target">Cilj</string>
+    <string name="goal_progress_from">Napredak prema</string>
+    <string name="goal_manual">Ručni unos</string>
+    <string name="goal_saved">Do sada ušteđeno</string>
+    <string name="deadline">Rok</string>
+    <string name="by_date">do %1$s</string>
+
+    <!-- Debts -->
+    <string name="add_debt">Dodaj dug</string>
+    <string name="edit_debt">Uredi dug</string>
+    <string name="no_debts">Nema dugova ni pozajmica</string>
+    <string name="i_owe">Dugujem</string>
+    <string name="owes_me">Duguje meni</string>
+    <string name="person">Osoba</string>
+    <string name="due_date">Rok</string>
+    <string name="settled">Izmireno</string>
+    <string name="paid_so_far">Do sada plaćeno: %1$s</string>
+    <string name="record_payment">Dodaj uplatu</string>
+
+    <!-- Capture -->
+    <string name="capture_sources">Izvori</string>
+    <string name="raiffeisen_text">Bankarska aplikacija i njene SMS poruke</string>
+    <string name="prompt_mode">Pitaj za kategoriju</string>
+    <string name="prompt_always">Nakon svakog plaćanja</string>
+    <string name="prompt_until_confident">Samo kad nije sigurno</string>
+    <string name="prompt_until_confident_text">Prestaje pitati kada trgovac nekoliko puta dobije istu kategoriju.</string>
+    <string name="prompt_never">Nikad</string>
+    <string name="cards">Kartice</string>
+    <string name="card_ending">Kartica koja završava na %1$s</string>
+    <string name="could_not_read">Nije pročitano</string>
+    <string name="show_captured">Prikaži zabilježena obavještenja</string>
+    <string name="hide_captured">Sakrij zabilježena obavještenja</string>
+
+    <!-- Currencies -->
+    <string name="exchange_rates">Kursevi valuta</string>
+    <string name="rates_from">Kursevi od %1$s</string>
+    <string name="refresh">Osvježi</string>
+    <string name="rates_updated">Kursevi su ažurirani</string>
+    <string name="rates_failed">Preuzimanje kurseva nije uspjelo</string>
+    <string name="no_rate">Nema kursa za %1$s</string>
+    <string name="set_rate">Ručno unesi kurs</string>
+    <string name="change_main_title">Promijeniti glavnu valutu u %1$s?</string>
+    <string name="change_main_text">Ukupni iznosi i budžeti se preračunavaju po današnjem kursu. Stanja računa se ne mijenjaju.</string>
+
+    <!-- Security -->
+    <string name="app_lock">Zaključavanje aplikacije</string>
+    <string name="app_lock_text">Traži PIN pri otvaranju Novke i sakrij je sa snimaka ekrana i nedavnih aplikacija.</string>
+    <string name="set_pin">Postavi PIN</string>
+    <string name="change_pin">Promijeni PIN</string>
+    <string name="new_pin">Novi PIN</string>
+    <string name="repeat_pin">Ponovi PIN</string>
+    <string name="pin_hint">Najmanje 4 cifre. Zaboravljeni PIN se ne može vratiti.</string>
+    <string name="hide_amounts">Sakrij iznose na zaključanom ekranu</string>
+    <string name="hide_amounts_text">Obavještenja o plaćanju prikazuju samo trgovca.</string>
+    <string name="lock_after">Zaključaj nakon izlaska iz aplikacije</string>
+    <string name="lock_immediately">Odmah</string>
+    <string name="lock_30s">Nakon 30 sekundi</string>
+    <string name="lock_1m">Nakon 1 minute</string>
+    <string name="lock_5m">Nakon 5 minuta</string>
+
+    <!-- Backup -->
+    <string name="backup_title">Sigurnosna kopija</string>
+    <string name="backup_text">Datoteka sigurnosne kopije sadrži sve iz Novke. S lozinkom je šifrirana; bez nje je može pročitati svako ko ima datoteku.</string>
+    <string name="backup_password">Lozinka (neobavezno)</string>
+    <string name="create_backup">Napravi kopiju</string>
+    <string name="restore_backup">Vrati</string>
+    <string name="backup_saved">Kopija je sačuvana</string>
+    <string name="restore_title">Vratiti ovu kopiju?</string>
+    <string name="restore_text">Sve što je sada u Novki zamjenjuje se sadržajem datoteke.</string>
+    <string name="restore_done">Kopija je vraćena</string>
+    <string name="restore_wrong_password">Pogrešna lozinka</string>
+    <string name="restore_too_new">Ovu kopiju je napravila novija verzija Novke</string>
+    <string name="restore_corrupt">Ova datoteka nije Novkina sigurnosna kopija</string>
+    <string name="csv_title">Tabela (CSV)</string>
+    <string name="csv_text">Izvezite sve transakcije ili uvezite izvod iz banke. Redovi koji već postoje na računu se preskaču.</string>
+    <string name="export_csv">Izvezi CSV</string>
+    <string name="import_csv">Uvezi CSV</string>
+    <string name="import_into">Uvezi na račun</string>
+    <string name="csv_saved">CSV je sačuvan</string>
+    <string name="csv_imported">Uvezeno redova: %1$d, preskočeno nečitljivih: %2$d</string>
+    <string name="csv_missing_columns">Datoteka nema kolonu za: %1$s</string>
+
+    <!-- Privacy -->
+    <string name="privacy_text">Novka sve čuva na ovom telefonu. Nema korisničkog računa, servera ni analitike.\n\nJedino što Novka preuzima je lista kurseva valuta. Uz taj zahtjev se ne šalje ništa o vama ni o vašem novcu.\n\nUz pristup obavještenjima Novka čita obavještenja o plaćanju iz Google Walleta i Raiffeisena, te SMS obavještenja od Raiffeisena. Ostala obavještenja se zanemaruju i nikada se ne čuvaju. Jednokratni kodovi u porukama banke zamjenjuju se tačkama prije nego što se poruka sačuva.\n\nSigurnosne kopije i CSV datoteke zapisuju se samo tamo gdje ih vi odlučite sačuvati. Kopija bez lozinke nije šifrirana.\n\nBrisanjem aplikacije brišu se svi njeni podaci.</string>
 </resources>

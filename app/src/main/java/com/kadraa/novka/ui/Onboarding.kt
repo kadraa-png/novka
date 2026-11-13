@@ -13,11 +13,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
@@ -40,7 +36,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.ListItem
@@ -82,7 +77,6 @@ fun accountTypeLabel(type: AccountType): String = t(
     }
 )
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun Onboarding(vm: MainViewModel) {
     val context = LocalContext.current
@@ -153,14 +147,7 @@ fun Onboarding(vm: MainViewModel) {
                         }
                         1 -> {
                             StepHeader(Icons.Rounded.AccountBalanceWallet, t(R.string.first_account_title), t(R.string.first_account_text))
-                            FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                AccountType.entries.forEach { option ->
-                                    FilterChip(
-                                        selected = type == option, onClick = { type = option }, label = { Text(accountTypeLabel(option)) },
-                                        leadingIcon = { Icon(accountIcon(option), null, Modifier.size(18.dp)) },
-                                    )
-                                }
-                            }
+                            AccountTypeChips(type) { type = it }
                             Spacer(Modifier.height(16.dp))
                             OutlinedTextField(name, { name = it }, label = { Text(t(R.string.account_name)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
                             Spacer(Modifier.height(16.dp))

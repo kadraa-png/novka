@@ -141,13 +141,15 @@ fun HomeScreen(data: AppData, vm: MainViewModel, nav: NavHostController) {
         val to = month.atEndOfMonth().endMillis()
         data.txs.filter { it.timestamp in from..to }
     }
-    val spent = -monthTxs.filter { it.type == TxType.EXPENSE }.sumOf { it.mainAmount }
-    val earned = monthTxs.filter { it.type == TxType.INCOME }.sumOf { it.mainAmount }
-    val review = data.txs.filter { it.needsReview }
+    val spent = remember(monthTxs) { -monthTxs.filter { it.type == TxType.EXPENSE }.sumOf { it.mainAmount } }
+    val earned = remember(monthTxs) { monthTxs.filter { it.type == TxType.INCOME }.sumOf { it.mainAmount } }
+    val review = remember(data.txs) { data.txs.filter { it.needsReview } }
     val budgets = remember(data.txs, data.budgets, data.categories) { budgetLines(data).sortedByDescending { it.status.fraction }.take(3) }
     val upcoming = data.recurring.filter { it.active }.take(3)
     val ratesAgeDays = if (data.settings.ratesFetchedAt == 0L) null else (System.currentTimeMillis() - data.settings.ratesFetchedAt) / 86_400_000
     val foreign = data.activeAccounts.any { it.account.currency != main }
+
+    val recent = remember(data.txs) { data.txs.asSequence().filter { it.type != TxType.TRANSFER || it.amount < 0 }.take(8).toList() }
 
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
         LazyColumn(Modifier.widthIn(max = 840.dp), contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp)) {
@@ -271,7 +273,6 @@ fun HomeScreen(data: AppData, vm: MainViewModel, nav: NavHostController) {
             }
 
             item { SectionTitle(t(R.string.recent), Modifier.padding(start = 16.dp, end = 8.dp), t(R.string.see_all)) { vm.filter = TxFilter(); nav.goToTab("transactions") } }
-            val recent = data.txs.filter { it.type != TxType.TRANSFER || it.amount < 0 }.take(8)
             if (recent.isEmpty()) item { EmptyState(t(R.string.no_transactions)) }
             items(recent, key = { it.id }) { tx -> TxRow(tx, data, onClick = { vm.editing = Editing(tx = tx) }) }
         }

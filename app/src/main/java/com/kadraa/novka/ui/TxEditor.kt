@@ -10,22 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Category
-import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
-import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.SegmentedButton
-import androidx.compose.material3.SegmentedButtonDefaults
-import androidx.compose.material3.SingleChoiceSegmentedButtonRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -39,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.kadraa.novka.R
 import com.kadraa.novka.data.Account
@@ -112,14 +101,7 @@ fun TxEditorSheet(editing: Editing, data: AppData, vm: MainViewModel) = key(edit
         ) {
             Text(t(if (tx == null) R.string.new_transaction else R.string.edit_transaction), style = MaterialTheme.typography.titleLarge)
 
-            SingleChoiceSegmentedButtonRow(Modifier.fillMaxWidth()) {
-                val types = TxType.entries
-                types.forEachIndexed { index, option ->
-                    SegmentedButton(
-                        selected = type == option, onClick = { type = option }, shape = SegmentedButtonDefaults.itemShape(index, types.size),
-                    ) { Text(typeLabel(option), maxLines = 1) }
-                }
-            }
+            Segmented(TxType.entries.map { it to typeLabel(it) }, type, { type = it })
 
             AmountField(amount, { amount = it }, t(R.string.amount), currency, Modifier.focusRequester(focus))
 
@@ -134,17 +116,7 @@ fun TxEditorSheet(editing: Editing, data: AppData, vm: MainViewModel) = key(edit
                     text = { "${it.name} (${Money.symbol(it.currency)})" }, onSelect = { toId = it.id },
                 )
             } else {
-                OutlinedCard(onClick = { pickCategory = true }, shape = MaterialTheme.shapes.extraSmall) {
-                    ListItem(
-                        overlineContent = { Text(t(R.string.category)) },
-                        headlineContent = { Text(category?.takeIf { it.kind == kind }?.name ?: t(R.string.uncategorised)) },
-                        leadingContent = {
-                            if (category != null && category.kind == kind) CategoryBadge(category.icon, category.colour) else IconBadge(Icons.Rounded.Category)
-                        },
-                        trailingContent = { Icon(Icons.Rounded.ChevronRight, null) },
-                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
-                    )
-                }
+                CategoryField(category?.takeIf { it.kind == kind }) { pickCategory = true }
                 OutlinedTextField(merchant, { merchant = it }, label = { Text(t(R.string.merchant)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
             }
 

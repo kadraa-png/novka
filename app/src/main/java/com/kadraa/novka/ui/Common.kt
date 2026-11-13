@@ -21,17 +21,22 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.material.icons.automirrored.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.CalendarToday
+import androidx.compose.material.icons.rounded.Category
+import androidx.compose.material.icons.rounded.ChevronRight
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Inbox
 import androidx.compose.material.icons.rounded.Search
@@ -43,6 +48,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -52,6 +58,12 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.SegmentedButton
+import androidx.compose.material3.SegmentedButtonDefaults
+import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Switch
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -207,7 +219,13 @@ fun EmptyState(text: String, icon: ImageVector = Icons.Rounded.Inbox) {
 }
 
 @Composable
-fun SubScreen(title: String, onBack: () -> Unit, actions: @Composable RowScope.() -> Unit = {}, content: @Composable (PaddingValues) -> Unit) {
+fun SubScreen(
+    title: String,
+    onBack: () -> Unit,
+    actions: @Composable RowScope.() -> Unit = {},
+    fab: @Composable () -> Unit = {},
+    content: @Composable (PaddingValues) -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -216,6 +234,7 @@ fun SubScreen(title: String, onBack: () -> Unit, actions: @Composable RowScope.(
                 actions = actions,
             )
         },
+        floatingActionButton = fab,
         content = content,
     )
 }
@@ -489,3 +508,78 @@ fun FullScreenMessage(text: String) {
         Text(text, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
+
+// ---- Pieces shared by the list and settings screens ----
+
+@Composable
+fun AddFab(label: String, onClick: () -> Unit) {
+    ExtendedFloatingActionButton(onClick = onClick, icon = { Icon(Icons.Rounded.Add, null) }, text = { Text(label) })
+}
+
+/** The scrolling body of a sub-screen: centred, capped in width, with room for a floating button. */
+@Composable
+fun ScreenColumn(padding: PaddingValues, content: @Composable ColumnScope.() -> Unit) {
+    Box(Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.TopCenter) {
+        Column(Modifier.widthIn(max = 840.dp).verticalScroll(rememberScrollState()).padding(top = 8.dp, bottom = 96.dp), content = content)
+    }
+}
+
+@Composable
+fun <T> Segmented(options: List<Pair<T, String>>, selected: T, onSelect: (T) -> Unit, modifier: Modifier = Modifier) {
+    SingleChoiceSegmentedButtonRow(modifier.fillMaxWidth()) {
+        options.forEachIndexed { index, (value, label) ->
+            SegmentedButton(
+                selected = value == selected, onClick = { onSelect(value) }, shape = SegmentedButtonDefaults.itemShape(index, options.size),
+            ) { Text(label, maxLines = 1) }
+        }
+    }
+}
+
+/** A form row that opens a picker: label above, current value below. */
+@Composable
+fun PickerField(label: String, value: String, onClick: () -> Unit, enabled: Boolean = true, leading: (@Composable () -> Unit)? = null) {
+    OutlinedCard(onClick = onClick, enabled = enabled, shape = MaterialTheme.shapes.extraSmall) {
+        ListItem(
+            overlineContent = { Text(label) },
+            headlineContent = { Text(value, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+            leadingContent = leading,
+            trailingContent = { if (enabled) Icon(Icons.Rounded.ChevronRight, null) },
+            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        )
+    }
+}
+
+@Composable
+fun CategoryField(category: Category?, onClick: () -> Unit) {
+    PickerField(t(R.string.category), category?.name ?: t(R.string.uncategorised), onClick) {
+        if (category != null) CategoryBadge(category.icon, category.colour) else IconBadge(Icons.Rounded.Category)
+    }
+}
+
+@Composable
+fun SwitchRow(title: String, checked: Boolean, onChange: (Boolean) -> Unit, text: String? = null, enabled: Boolean = true) {
+    val supporting: (@Composable () -> Unit)? = text?.let { { Text(it) } }
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = supporting,
+        trailingContent = { Switch(checked, null, enabled = enabled) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.toggleable(checked, enabled = enabled, role = Role.Switch, onValueChange = onChange),
+    )
+}
+
+@Composable
+fun RadioRow(title: String, selected: Boolean, onClick: () -> Unit, text: String? = null) {
+    val supporting: (@Composable () -> Unit)? = text?.let { { Text(it) } }
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = supporting,
+        leadingContent = { RadioButton(selected, null) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.selectable(selected, role = Role.RadioButton, onClick = onClick),
+    )
+}
+
+/** A stored swatch colour as a soft container that works on light and dark surfaces. */
+@Composable
+fun tinted(colour: Long): Color = Color(colour).copy(alpha = 0.24f).compositeOver(MaterialTheme.colorScheme.surface)

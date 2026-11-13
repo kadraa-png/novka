@@ -5,9 +5,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.kadraa.novka.domain.PromptMode
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import java.security.MessageDigest
@@ -58,7 +60,9 @@ class SettingsStore(private val context: Context) {
     suspend fun setPin(pin: String) {
         val salt = ByteArray(16).also { SecureRandom().nextBytes(it) }
         val encoder = Base64.getEncoder()
-        context.dataStore.edit { it[pinKey] = encoder.encodeToString(salt) + ":" + encoder.encodeToString(Pin.hash(pin, salt)) }
+        // Hashing takes a noticeable fraction of a second, so it stays off the main thread.
+        val hash = withContext(Dispatchers.Default) { Pin.hash(pin, salt) }
+        context.dataStore.edit { it[pinKey] = encoder.encodeToString(salt) + ":" + encoder.encodeToString(hash) }
     }
 
     suspend fun hasPin(): Boolean = context.dataStore.data.first()[pinKey] != null
@@ -66,7 +70,7 @@ class SettingsStore(private val context: Context) {
     suspend fun checkPin(pin: String): Boolean {
         val stored = context.dataStore.data.first()[pinKey] ?: return false
         val (salt, hash) = stored.split(':').map { Base64.getDecoder().decode(it) }
-        return MessageDigest.isEqual(hash, Pin.hash(pin, salt))
+        return MessageDigest.isEqual(hash, withContext(Dispatchers.Default) { Pin.hash(pin, salt) })
     }
 }
 

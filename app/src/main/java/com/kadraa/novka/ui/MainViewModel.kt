@@ -65,7 +65,8 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     var filter by mutableStateOf(TxFilter())
 
     var locked by mutableStateOf(false)
-    var lockChecked = false
+    // Observable, because the first frame is held back until the lock setting has been read.
+    var lockChecked by mutableStateOf(false)
     var backgroundedAt = 0L
 
     fun run(block: suspend Repository.() -> Unit): Job = viewModelScope.launch {
