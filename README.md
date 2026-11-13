@@ -60,12 +60,6 @@ Native Kotlin, Jetpack Compose with Material 3, Room, DataStore, WorkManager,
 Navigation Compose and Vico for charts. Money is stored as whole minor units in a
 `Long`; balances are always derived, never stored.
 
-- [HANDOFF.md](HANDOFF.md): developer notes on what is done, what is still owed and
-  how the pieces fit together.
-- [Design spec](docs/superpowers/specs/2026-11-12-finance-app-design.md): the
-  original design.
-- [CHANGELOG.md](CHANGELOG.md): what changed in each version.
-
 ## Support
 
 Novka is free. If it is useful to you, you can
