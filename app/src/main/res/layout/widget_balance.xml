@@ -6,7 +6,8 @@
     android:background="@drawable/widget_background"
     android:gravity="center_vertical"
     android:orientation="horizontal"
-    android:padding="16dp">
+    android:paddingStart="20dp"
+    android:paddingEnd="16dp">
 
     <LinearLayout
         android:layout_width="0dp"
@@ -27,8 +28,7 @@
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:textColor="@color/widget_text"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/widget_spent"
@@ -40,14 +40,12 @@
             android:textSize="12sp" />
     </LinearLayout>
 
-    <TextView
+    <ImageView
         android:id="@+id/widget_add"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
         android:background="@drawable/widget_add_background"
         android:contentDescription="@string/add_transaction"
-        android:gravity="center"
-        android:text="+"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp" />
+        android:scaleType="center"
+        android:src="@drawable/ic_widget_add" />
 </LinearLayout>

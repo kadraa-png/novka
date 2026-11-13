@@ -2,25 +2,37 @@ package com.kadraa.novka.ui
 
 import android.content.Intent
 import android.provider.Settings as SystemSettings
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Autorenew
+import androidx.compose.material.icons.rounded.NotificationsOff
+import androidx.compose.material.icons.rounded.RateReview
+import androidx.compose.material.icons.rounded.SouthWest
+import androidx.compose.material.icons.rounded.NorthEast
+import androidx.compose.material.icons.rounded.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedCard
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -30,8 +42,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
@@ -61,31 +74,58 @@ fun budgetLines(data: AppData, today: LocalDate = LocalDate.now()): List<BudgetL
 }
 
 @Composable
-fun StatTile(label: String, value: String, modifier: Modifier = Modifier) {
-    OutlinedCard(modifier) {
-        Column(Modifier.padding(12.dp)) {
-            Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            Text(value, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 1, overflow = TextOverflow.Ellipsis)
+fun StatTile(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
+    container: Color = MaterialTheme.colorScheme.surfaceContainerHigh,
+) {
+    Card(modifier, colors = CardDefaults.cardColors(containerColor = container)) {
+        Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                if (icon != null) {
+                    Icon(icon, null, Modifier.size(16.dp), tint = MaterialTheme.colorScheme.onSurfaceVariant)
+                    Spacer(Modifier.width(4.dp))
+                }
+                Text(label, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+            }
+            Text(value, style = MaterialTheme.typography.titleLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
         }
     }
 }
 
 @Composable
 fun BudgetProgress(line: BudgetLine, main: String, modifier: Modifier = Modifier) {
-    Column(modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("${line.icon} ${line.name}", modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
-            Text(
-                "${Money.formatNumber(line.status.spent, main)} / ${Money.format(line.status.limit, main)}",
-                style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant,
+    val over = line.status.level >= 100
+    Row(modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+        CategoryBadge(line.icon, line.colour)
+        Spacer(Modifier.width(16.dp))
+        Column(Modifier.weight(1f)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(line.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    "${Money.formatNumber(line.status.spent, main)} / ${Money.format(line.status.limit, main)}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Spacer(Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = { line.status.fraction.coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth(),
+                color = if (over) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
             )
         }
-        Spacer(Modifier.height(4.dp))
-        LinearProgressIndicator(
-            progress = { line.status.fraction.coerceIn(0f, 1f) }, modifier = Modifier.fillMaxWidth().height(8.dp),
-            color = if (line.status.level >= 100) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-        )
     }
+}
+
+/** A filled card that groups one section of a screen. */
+@Composable
+fun SectionCard(modifier: Modifier = Modifier, container: Color = MaterialTheme.colorScheme.surfaceContainerLow, content: @Composable () -> Unit) {
+    Card(
+        modifier.fillMaxWidth().padding(horizontal = 16.dp), shape = MaterialTheme.shapes.large,
+        colors = CardDefaults.cardColors(containerColor = container),
+    ) { content() }
 }
 
 @Composable
@@ -109,109 +149,131 @@ fun HomeScreen(data: AppData, vm: MainViewModel, nav: NavHostController) {
     val ratesAgeDays = if (data.settings.ratesFetchedAt == 0L) null else (System.currentTimeMillis() - data.settings.ratesFetchedAt) / 86_400_000
     val foreign = data.activeAccounts.any { it.account.currency != main }
 
-    LazyColumn(Modifier.statusBarsPadding(), contentPadding = PaddingValues(bottom = 88.dp)) {
-        item {
-            Column(Modifier.padding(horizontal = 16.dp, vertical = 12.dp)) {
-                Text(t(R.string.total_balance), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Text(Money.format(data.totalBalance, main), style = MaterialTheme.typography.displaySmall, fontWeight = FontWeight.SemiBold)
-                if (foreign && (ratesAgeDays == null || ratesAgeDays >= 3)) {
-                    Text(
-                        if (ratesAgeDays == null) t(R.string.rates_missing) else t(R.string.rates_age, ratesAgeDays.toInt()),
-                        style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.tertiary,
-                    )
-                }
-                Spacer(Modifier.height(12.dp))
-                Text(t(R.string.this_month), style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                Spacer(Modifier.height(4.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    StatTile(t(R.string.spent), Money.format(spent, main), Modifier.weight(1f))
-                    StatTile(t(R.string.earned), Money.format(earned, main), Modifier.weight(1f))
-                }
-                Spacer(Modifier.height(8.dp))
-                StatTile(t(R.string.net), signed(earned - spent, main), Modifier.fillMaxWidth())
-            }
-        }
-
-        if ((data.settings.walletEnabled || data.settings.raiffeisenEnabled) && !listenerOn) {
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        LazyColumn(Modifier.widthIn(max = 840.dp), contentPadding = PaddingValues(top = 16.dp, bottom = 96.dp)) {
             item {
-                Card(
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-                ) {
-                    Column(Modifier.padding(16.dp)) {
-                        Text(t(R.string.capture_off_title), fontWeight = FontWeight.SemiBold)
-                        Text(t(R.string.capture_off_text), style = MaterialTheme.typography.bodyMedium)
-                        Row {
-                            TextButton(onClick = { context.startActivity(Intent(SystemSettings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text(t(R.string.open_settings)) }
-                            TextButton(onClick = { vm.run { settings.update { it.copy(walletEnabled = false, raiffeisenEnabled = false) } } }) { Text(t(R.string.turn_off)) }
+                SectionCard(container = MaterialTheme.colorScheme.primaryContainer, modifier = Modifier.padding(bottom = 8.dp)) {
+                    Column(Modifier.padding(20.dp)) {
+                        Text(t(R.string.total_balance), style = MaterialTheme.typography.labelLarge)
+                        Text(Money.format(data.totalBalance, main), style = MaterialTheme.typography.displaySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                        if (foreign && (ratesAgeDays == null || ratesAgeDays >= 3)) {
+                            Row(Modifier.padding(top = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Rounded.Warning, null, Modifier.size(16.dp))
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    if (ratesAgeDays == null) t(R.string.rates_missing) else t(R.string.rates_age, ratesAgeDays.toInt()),
+                                    style = MaterialTheme.typography.bodySmall,
+                                )
+                            }
+                        }
+                        Spacer(Modifier.height(20.dp))
+                        Text(t(R.string.this_month), style = MaterialTheme.typography.labelLarge)
+                        Spacer(Modifier.height(8.dp))
+                        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                            StatTile(t(R.string.spent), Money.format(spent, main), Modifier.weight(1f), Icons.Rounded.NorthEast, MaterialTheme.colorScheme.surface)
+                            StatTile(t(R.string.earned), Money.format(earned, main), Modifier.weight(1f), Icons.Rounded.SouthWest, MaterialTheme.colorScheme.surface)
+                        }
+                        Row(Modifier.padding(top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                            Text(t(R.string.net), style = MaterialTheme.typography.labelLarge, modifier = Modifier.weight(1f))
+                            Text(signed(earned - spent, main), style = MaterialTheme.typography.titleMedium)
                         }
                     }
                 }
             }
-        }
 
-        if (review.isNotEmpty()) {
-            item {
-                Card(
-                    Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
-                ) {
-                    Column(Modifier.padding(vertical = 8.dp)) {
-                        Row(Modifier.padding(horizontal = 16.dp), verticalAlignment = Alignment.CenterVertically) {
-                            Text(t(R.string.needs_review_count, review.size), fontWeight = FontWeight.SemiBold, modifier = Modifier.weight(1f))
-                            TextButton(onClick = { vm.filter = TxFilter(reviewOnly = true); nav.goToTab("transactions") }) { Text(t(R.string.see_all)) }
-                        }
-                        review.take(3).forEach { tx -> TxRow(tx, data, onClick = { vm.editing = Editing(tx = tx) }) }
-                    }
-                }
-            }
-        }
-
-        item {
-            SectionTitle(t(R.string.accounts), Modifier.padding(horizontal = 16.dp), t(R.string.manage)) { nav.navigate("accounts") }
-            LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                items(data.activeAccounts, key = { it.account.id }) { row ->
-                    OutlinedCard(Modifier.width(170.dp).clickable { vm.filter = TxFilter(accountId = row.account.id); nav.goToTab("transactions") }) {
-                        Column(Modifier.padding(12.dp)) {
-                            Text(row.account.name, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                            Text(Money.format(row.balance, row.account.currency), style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.SemiBold, maxLines = 1)
+            if ((data.settings.walletEnabled || data.settings.raiffeisenEnabled) && !listenerOn) {
+                item {
+                    SectionCard(container = MaterialTheme.colorScheme.tertiaryContainer, modifier = Modifier.padding(vertical = 8.dp)) {
+                        Column(Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp)) {
+                            Row {
+                                Icon(Icons.Rounded.NotificationsOff, null)
+                                Spacer(Modifier.width(16.dp))
+                                Column {
+                                    Text(t(R.string.capture_off_title), style = MaterialTheme.typography.titleMedium)
+                                    Text(t(R.string.capture_off_text), style = MaterialTheme.typography.bodyMedium)
+                                }
+                            }
+                            Row(Modifier.fillMaxWidth().padding(top = 8.dp), horizontalArrangement = Arrangement.spacedBy(8.dp, Alignment.End)) {
+                                TextButton(onClick = { vm.run { settings.update { it.copy(walletEnabled = false, raiffeisenEnabled = false) } } }) { Text(t(R.string.turn_off)) }
+                                FilledTonalButton(onClick = { context.startActivity(Intent(SystemSettings.ACTION_NOTIFICATION_LISTENER_SETTINGS)) }) { Text(t(R.string.open_settings)) }
+                            }
                         }
                     }
                 }
             }
-        }
 
-        if (budgets.isNotEmpty()) {
-            item {
-                Column(Modifier.padding(horizontal = 16.dp)) {
-                    SectionTitle(t(R.string.tab_budgets), action = t(R.string.see_all)) { nav.goToTab("budgets") }
-                    budgets.forEach { BudgetProgress(it, main) }
-                }
-            }
-        }
-
-        if (upcoming.isNotEmpty()) {
-            item {
-                Column(Modifier.padding(horizontal = 16.dp)) {
-                    SectionTitle(t(R.string.upcoming), action = t(R.string.manage)) { nav.navigate("recurring") }
-                    upcoming.forEach { rule ->
-                        val currency = data.accountById[rule.accountId]?.account?.currency ?: main
-                        Row(Modifier.fillMaxWidth().padding(vertical = 6.dp)) {
-                            Text(
-                                rule.merchant.ifBlank { data.categoryById[rule.categoryId]?.name ?: typeLabel(rule.type) },
-                                modifier = Modifier.weight(1f), maxLines = 1, overflow = TextOverflow.Ellipsis,
-                            )
-                            Text(formatDate(LocalDate.parse(rule.nextDue)), color = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.padding(end = 12.dp))
-                            Text(signed(rule.amount, currency), fontWeight = FontWeight.Medium)
+            if (review.isNotEmpty()) {
+                item {
+                    SectionCard(container = MaterialTheme.colorScheme.surfaceContainerHigh, modifier = Modifier.padding(vertical = 8.dp)) {
+                        Column(Modifier.padding(vertical = 8.dp)) {
+                            Row(Modifier.padding(start = 16.dp, end = 8.dp), verticalAlignment = Alignment.CenterVertically) {
+                                Icon(Icons.Rounded.RateReview, null, tint = MaterialTheme.colorScheme.primary)
+                                Spacer(Modifier.width(16.dp))
+                                Text(t(R.string.needs_review_count, review.size), style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
+                                TextButton(onClick = { vm.filter = TxFilter(reviewOnly = true); nav.goToTab("transactions") }) { Text(t(R.string.see_all)) }
+                            }
+                            review.take(3).forEach { tx -> TxRow(tx, data, onClick = { vm.editing = Editing(tx = tx) }) }
                         }
                     }
                 }
             }
-        }
 
-        item { SectionTitle(t(R.string.recent), Modifier.padding(horizontal = 16.dp), t(R.string.see_all)) { vm.filter = TxFilter(); nav.goToTab("transactions") } }
-        val recent = data.txs.filter { it.type != TxType.TRANSFER || it.amount < 0 }.take(8)
-        if (recent.isEmpty()) item { EmptyState(t(R.string.no_transactions)) }
-        items(recent, key = { it.id }) { tx -> TxRow(tx, data, onClick = { vm.editing = Editing(tx = tx) }) }
+            item {
+                SectionTitle(t(R.string.accounts), Modifier.padding(start = 16.dp, end = 8.dp), t(R.string.manage)) { nav.navigate("accounts") }
+                LazyRow(contentPadding = PaddingValues(horizontal = 16.dp), horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    items(data.activeAccounts, key = { it.account.id }) { row ->
+                        Card(
+                            onClick = { vm.filter = TxFilter(accountId = row.account.id); nav.goToTab("transactions") },
+                            modifier = Modifier.width(176.dp), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+                        ) {
+                            Column(Modifier.padding(16.dp)) {
+                                IconBadge(accountIcon(row.account.type))
+                                Spacer(Modifier.height(12.dp))
+                                Text(
+                                    row.account.name, style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    maxLines = 1, overflow = TextOverflow.Ellipsis,
+                                )
+                                Text(Money.format(row.balance, row.account.currency), style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (budgets.isNotEmpty()) {
+                item {
+                    SectionTitle(t(R.string.tab_budgets), Modifier.padding(start = 16.dp, end = 8.dp), t(R.string.see_all)) { nav.goToTab("budgets") }
+                    SectionCard {
+                        Column(Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) { budgets.forEach { BudgetProgress(it, main) } }
+                    }
+                }
+            }
+
+            if (upcoming.isNotEmpty()) {
+                item {
+                    SectionTitle(t(R.string.upcoming), Modifier.padding(start = 16.dp, end = 8.dp), t(R.string.manage)) { nav.navigate("recurring") }
+                    SectionCard {
+                        Column {
+                            upcoming.forEach { rule ->
+                                val currency = data.accountById[rule.accountId]?.account?.currency ?: main
+                                val category = data.categoryById[rule.categoryId]
+                                ListItem(
+                                    headlineContent = { Text(rule.merchant.ifBlank { category?.name ?: typeLabel(rule.type) }, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                                    supportingContent = { Text(formatDate(LocalDate.parse(rule.nextDue))) },
+                                    leadingContent = { if (category != null) CategoryBadge(category.icon, category.colour) else IconBadge(Icons.Rounded.Autorenew) },
+                                    trailingContent = { Text(signed(rule.amount, currency), style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurface) },
+                                    colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+
+            item { SectionTitle(t(R.string.recent), Modifier.padding(start = 16.dp, end = 8.dp), t(R.string.see_all)) { vm.filter = TxFilter(); nav.goToTab("transactions") } }
+            val recent = data.txs.filter { it.type != TxType.TRANSFER || it.amount < 0 }.take(8)
+            if (recent.isEmpty()) item { EmptyState(t(R.string.no_transactions)) }
+            items(recent, key = { it.id }) { tx -> TxRow(tx, data, onClick = { vm.editing = Editing(tx = tx) }) }
+        }
     }
 }

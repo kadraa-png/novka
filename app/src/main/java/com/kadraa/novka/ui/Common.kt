@@ -3,6 +3,7 @@
 package com.kadraa.novka.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -23,12 +24,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
+import androidx.compose.material.icons.automirrored.rounded.HelpOutline
+import androidx.compose.material.icons.rounded.CalendarToday
+import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Inbox
+import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material.icons.rounded.SwapHoriz
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.DropdownMenuItem
@@ -38,6 +47,8 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedButton
@@ -56,13 +67,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kadraa.novka.R
 import com.kadraa.novka.data.Account
@@ -158,25 +171,38 @@ fun signed(amount: Long, currency: String): String = (if (amount > 0) "+" else "
 
 // ---- Small pieces ----
 
+/** A category's icon on a tint of its own colour. [icon] is a key from [categoryIcons]. */
 @Composable
 fun CategoryBadge(icon: String, colour: Long, size: Dp = 40.dp) {
-    Box(Modifier.size(size).clip(CircleShape).background(Color(colour).copy(alpha = 0.22f)), contentAlignment = Alignment.Center) {
-        Text(icon, fontSize = (size.value * 0.45f).sp)
+    val scheme = MaterialTheme.colorScheme
+    IconBadge(categoryIcon(icon), size, Color(colour).copy(alpha = 0.24f).compositeOver(scheme.surface), scheme.onSurface)
+}
+
+@Composable
+fun IconBadge(
+    icon: ImageVector,
+    size: Dp = 40.dp,
+    container: Color = MaterialTheme.colorScheme.secondaryContainer,
+    tint: Color = MaterialTheme.colorScheme.onSecondaryContainer,
+) {
+    Box(Modifier.size(size).background(container, CircleShape), contentAlignment = Alignment.Center) {
+        Icon(icon, null, Modifier.size(size * 0.55f), tint = tint)
     }
 }
 
 @Composable
 fun SectionTitle(text: String, modifier: Modifier = Modifier, action: String? = null, onAction: () -> Unit = {}) {
-    Row(modifier.fillMaxWidth().padding(top = 12.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(modifier.fillMaxWidth().heightIn(min = 48.dp).padding(top = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(text, style = MaterialTheme.typography.titleMedium, modifier = Modifier.weight(1f))
         if (action != null) TextButton(onClick = onAction) { Text(action) }
     }
 }
 
 @Composable
-fun EmptyState(text: String) {
-    Box(Modifier.fillMaxWidth().padding(32.dp), contentAlignment = Alignment.Center) {
-        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyMedium)
+fun EmptyState(text: String, icon: ImageVector = Icons.Rounded.Inbox) {
+    Column(Modifier.fillMaxWidth().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Icon(icon, null, Modifier.size(48.dp), tint = MaterialTheme.colorScheme.outline)
+        Text(text, color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.bodyLarge)
     }
 }
 
@@ -186,7 +212,7 @@ fun SubScreen(title: String, onBack: () -> Unit, actions: @Composable RowScope.(
         topBar = {
             TopAppBar(
                 title = { Text(title) },
-                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, t(R.string.back)) } },
+                navigationIcon = { IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Rounded.ArrowBack, t(R.string.back)) } },
                 actions = actions,
             )
         },
@@ -226,7 +252,9 @@ fun AmountField(value: String, onChange: (String) -> Unit, label: String, curren
 @Composable
 fun DateButton(label: String, date: LocalDate?, onPick: (LocalDate) -> Unit, modifier: Modifier = Modifier, onClear: (() -> Unit)? = null) {
     var open by remember { mutableStateOf(false) }
-    OutlinedButton(onClick = { open = true }, modifier = modifier) {
+    OutlinedButton(onClick = { open = true }, modifier = modifier, contentPadding = ButtonDefaults.ButtonWithIconContentPadding) {
+        Icon(Icons.Rounded.CalendarToday, null, Modifier.size(ButtonDefaults.IconSize))
+        Spacer(Modifier.width(ButtonDefaults.IconSpacing))
         Text(if (date != null) "$label: ${formatDate(date)}" else label, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
     if (open) {
@@ -273,13 +301,16 @@ fun FormDialog(
         onDismissRequest = onDismiss,
         title = { Text(title) },
         text = {
-            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(10.dp), content = content)
+            Column(Modifier.verticalScroll(rememberScrollState()), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
         },
         confirmButton = { TextButton(onClick = { onSave(); onDismiss() }, enabled = saveEnabled) { Text(t(R.string.save)) } },
         dismissButton = {
             Row {
                 if (onDelete != null) {
-                    TextButton(onClick = { onDelete(); onDismiss() }) { Text(t(R.string.delete), color = MaterialTheme.colorScheme.error) }
+                    TextButton(
+                        onClick = { onDelete(); onDismiss() },
+                        colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error),
+                    ) { Text(t(R.string.delete)) }
                 }
                 TextButton(onClick = onDismiss) { Text(t(R.string.cancel)) }
             }
@@ -290,12 +321,22 @@ fun FormDialog(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun ColourPicker(selected: Long, onPick: (Long) -> Unit) {
-    FlowRow(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    FlowRow {
         com.kadraa.novka.domain.DefaultCategories.colours.forEach { colour ->
+            val picked = colour == selected
             Box(
-                Modifier.size(32.dp).clip(CircleShape).background(Color(colour)).clickable { onPick(colour) },
+                Modifier.size(48.dp).clip(CircleShape).selectable(picked, role = Role.RadioButton) { onPick(colour) },
                 contentAlignment = Alignment.Center,
-            ) { if (colour == selected) Text("✓", color = Color.White, fontWeight = FontWeight.Bold) }
+            ) {
+                Box(
+                    Modifier.size(36.dp).background(Color(colour), CircleShape)
+                        .then(if (picked) Modifier.border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape) else Modifier),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    // The swatch is a stored data colour, so the tick picks whichever of black or white reads on it.
+                    if (picked) Icon(Icons.Rounded.Check, null, Modifier.size(20.dp), tint = if (Color(colour).luminance() > 0.4f) Color.Black else Color.White)
+                }
+            }
         }
     }
 }
@@ -333,14 +374,12 @@ fun CategoryPickerDialog(
 
 @Composable
 private fun CategoryPickRow(category: Category, indent: Boolean, onClick: () -> Unit) {
-    Row(
-        Modifier.fillMaxWidth().clickable(onClick = onClick).padding(start = if (indent) 28.dp else 0.dp, top = 6.dp, bottom = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-    ) {
-        CategoryBadge(category.icon, category.colour, if (indent) 32.dp else 38.dp)
-        Spacer(Modifier.width(12.dp))
-        Text(category.name, fontWeight = if (indent) FontWeight.Normal else FontWeight.SemiBold)
-    }
+    ListItem(
+        headlineContent = { Text(category.name, style = if (indent) MaterialTheme.typography.bodyLarge else MaterialTheme.typography.titleMedium) },
+        leadingContent = { CategoryBadge(category.icon, category.colour, if (indent) 32.dp else 40.dp) },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = Modifier.clip(MaterialTheme.shapes.medium).clickable(onClick = onClick).padding(start = if (indent) 24.dp else 0.dp),
+    )
 }
 
 private val commonCurrencies = listOf("BAM", "EUR", "USD", "GBP", "CHF", "RSD", "TRY", "SEK", "NOK", "DKK", "PLN", "CZK", "HUF", "CAD", "AUD", "JPY")
@@ -359,13 +398,18 @@ fun CurrencyPickerDialog(onPick: (String) -> Unit, onDismiss: () -> Unit) {
         title = { Text(t(R.string.currency)) },
         text = {
             Column {
-                OutlinedTextField(query, { query = it }, label = { Text(t(R.string.search)) }, singleLine = true, modifier = Modifier.fillMaxWidth())
+                OutlinedTextField(
+                    query, { query = it }, label = { Text(t(R.string.search)) }, leadingIcon = { Icon(Icons.Rounded.Search, null) },
+                    singleLine = true, modifier = Modifier.fillMaxWidth(),
+                )
                 LazyColumn(Modifier.heightIn(max = 380.dp).padding(top = 8.dp)) {
                     items(shown, key = { it.first }) { (code, name) ->
-                        Row(Modifier.fillMaxWidth().clickable { onPick(code); onDismiss() }.padding(vertical = 10.dp)) {
-                            Text(code, fontWeight = FontWeight.SemiBold, modifier = Modifier.width(56.dp))
-                            Text(name, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        }
+                        ListItem(
+                            headlineContent = { Text(name, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+                            leadingContent = { Text(code, style = MaterialTheme.typography.labelLarge, modifier = Modifier.width(40.dp)) },
+                            colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+                            modifier = Modifier.clip(MaterialTheme.shapes.medium).clickable { onPick(code); onDismiss() },
+                        )
                     }
                 }
             }
@@ -402,37 +446,46 @@ fun TxRow(tx: Tx, data: AppData, onClick: () -> Unit, modifier: Modifier = Modif
         if (tx.pendingAuth) add(t(R.string.awaiting_confirmation))
         if (tx.needsReview) add(t(R.string.needs_review))
     }
-    Row(modifier.fillMaxWidth().clickable(onClick = onClick).padding(horizontal = 16.dp, vertical = 10.dp), verticalAlignment = Alignment.CenterVertically) {
-        when {
-            tx.type == TxType.TRANSFER -> CategoryBadge("↔", 0xFF78909C)
-            category != null -> CategoryBadge(category.icon, category.colour)
-            else -> CategoryBadge("❔", 0xFF78909C)
-        }
-        Spacer(Modifier.width(12.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodyLarge)
+    val supporting: (@Composable () -> Unit)? = if (details.isEmpty()) null else {
+        {
             Text(
-                details.joinToString(" · "), maxLines = 1, overflow = TextOverflow.Ellipsis, style = MaterialTheme.typography.bodySmall,
+                details.joinToString(" · "), maxLines = 1, overflow = TextOverflow.Ellipsis,
                 color = if (tx.needsReview) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
-        Spacer(Modifier.width(8.dp))
-        Column(horizontalAlignment = Alignment.End) {
-            Text(
-                signed(tx.amount, tx.currency), style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium,
-                color = if (tx.type == TxType.INCOME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-            )
-            if (tx.originalAmount != null && tx.originalCurrency != null) {
-                Text(Money.format(tx.originalAmount, tx.originalCurrency), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-            }
-        }
     }
+    ListItem(
+        headlineContent = { Text(title, maxLines = 1, overflow = TextOverflow.Ellipsis) },
+        supportingContent = supporting,
+        leadingContent = {
+            when {
+                tx.type == TxType.TRANSFER -> IconBadge(Icons.Rounded.SwapHoriz)
+                category != null -> CategoryBadge(category.icon, category.colour)
+                else -> IconBadge(Icons.AutoMirrored.Rounded.HelpOutline)
+            }
+        },
+        trailingContent = {
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    signed(tx.amount, tx.currency), style = MaterialTheme.typography.titleMedium,
+                    color = if (tx.type == TxType.INCOME) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                )
+                if (tx.originalAmount != null && tx.originalCurrency != null) {
+                    Text(Money.format(tx.originalAmount, tx.originalCurrency), style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            }
+        },
+        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
+        modifier = modifier.clickable(onClick = onClick),
+    )
 }
 
 @Composable
-fun Divider() = HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
+fun Divider() = HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
 
 @Composable
 fun FullScreenMessage(text: String) {
-    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) { Text(text) }
+    Box(Modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
+        Text(text, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
 }

@@ -66,7 +66,7 @@ object Notifier {
             val pending = PendingIntent.getBroadcast(
                 context, (prompt.txId % 100_000_000).toInt() * 10 + index, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
-            builder.addAction(0, if (index == 0) "✓ $label" else label, pending)
+            builder.addAction(0, label, pending)
         }
         builder.addAction(0, context.getString(R.string.other), open)
         post(context, promptId(prompt.txId), builder.build())

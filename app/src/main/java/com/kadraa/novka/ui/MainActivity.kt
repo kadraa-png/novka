@@ -11,27 +11,52 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.materialIcon
-import androidx.compose.material.icons.materialPath
+import androidx.compose.material.icons.automirrored.outlined.ReceiptLong
+import androidx.compose.material.icons.automirrored.rounded.ReceiptLong
+import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.Insights
+import androidx.compose.material.icons.outlined.PieChart
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Fingerprint
+import androidx.compose.material.icons.rounded.Home
+import androidx.compose.material.icons.rounded.Insights
+import androidx.compose.material.icons.rounded.Lock
+import androidx.compose.material.icons.rounded.Menu
+import androidx.compose.material.icons.rounded.PieChart
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.NavigationRail
+import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -40,7 +65,6 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -51,13 +75,17 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -175,53 +203,55 @@ fun LockScreen(vm: MainViewModel, settings: Settings, activity: FragmentActivity
         }
     }
 
-    LaunchedEffect(Unit) { if (canUseBiometrics) biometric() }
+    val focus = remember { FocusRequester() }
+    LaunchedEffect(Unit) { if (canUseBiometrics) biometric() else focus.requestFocus() }
 
     Column(
-        Modifier.fillMaxSize().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically),
+        Modifier.fillMaxSize().safeDrawingPadding().padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
     ) {
+        IconBadge(Icons.Rounded.Lock, 72.dp, MaterialTheme.colorScheme.primaryContainer, MaterialTheme.colorScheme.onPrimaryContainer)
+        Spacer(Modifier.height(24.dp))
         Text("Novka", style = MaterialTheme.typography.headlineMedium)
-        Text(title, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        OutlinedTextField(
-            value = pin, onValueChange = { new -> if (new.all(Char::isDigit) && new.length <= 12) { pin = new; wrong = false } },
-            label = { Text(t(R.string.pin)) }, singleLine = true, isError = wrong,
-            supportingText = { if (wrong) Text(t(R.string.wrong_pin)) },
-            visualTransformation = PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(onDone = { submit() }),
-            modifier = Modifier.widthIn(max = 280.dp),
-        )
-        Button(onClick = ::submit, enabled = !busy && pin.isNotEmpty()) { Text(t(R.string.unlock)) }
-        if (canUseBiometrics) TextButton(onClick = ::biometric) { Text(t(R.string.use_biometrics)) }
+        Text(title, style = MaterialTheme.typography.bodyLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Spacer(Modifier.height(32.dp))
+        Column(Modifier.widthIn(max = 320.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            OutlinedTextField(
+                value = pin, onValueChange = { new -> if (new.all(Char::isDigit) && new.length <= 12) { pin = new; wrong = false } },
+                label = { Text(t(R.string.pin)) }, singleLine = true, isError = wrong,
+                supportingText = { if (wrong) Text(t(R.string.wrong_pin)) },
+                visualTransformation = PasswordVisualTransformation(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword, imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(onDone = { submit() }),
+                modifier = Modifier.fillMaxWidth().focusRequester(focus),
+            )
+            Button(onClick = ::submit, enabled = !busy && pin.isNotEmpty(), modifier = Modifier.fillMaxWidth()) { Text(t(R.string.unlock)) }
+            if (canUseBiometrics) {
+                FilledTonalButton(onClick = ::biometric, modifier = Modifier.fillMaxWidth(), contentPadding = ButtonDefaults.ButtonWithIconContentPadding) {
+                    Icon(Icons.Rounded.Fingerprint, null, Modifier.size(ButtonDefaults.IconSize))
+                    Spacer(Modifier.width(ButtonDefaults.IconSpacing))
+                    Text(t(R.string.use_biometrics))
+                }
+            }
+        }
     }
 }
 
-private val insightsIcon: ImageVector = materialIcon("Insights") {
-    materialPath {
-        moveTo(4f, 20f); lineTo(4f, 11f); lineTo(8f, 11f); lineTo(8f, 20f); close()
-        moveTo(10f, 20f); lineTo(10f, 4f); lineTo(14f, 4f); lineTo(14f, 20f); close()
-        moveTo(16f, 20f); lineTo(16f, 14f); lineTo(20f, 14f); lineTo(20f, 20f); close()
-    }
-}
-
-private val budgetsIcon: ImageVector = materialIcon("Budgets") {
-    materialPath {
-        moveTo(4f, 5f); lineTo(20f, 5f); lineTo(20f, 8f); lineTo(4f, 8f); close()
-        moveTo(4f, 10.5f); lineTo(15f, 10.5f); lineTo(15f, 13.5f); lineTo(4f, 13.5f); close()
-        moveTo(4f, 16f); lineTo(10f, 16f); lineTo(10f, 19f); lineTo(4f, 19f); close()
-    }
-}
-
-private data class Tab(val route: String, val label: Int, val icon: ImageVector)
+private data class Tab(val route: String, val label: Int, val selectedIcon: ImageVector, val icon: ImageVector)
 
 private val tabs = listOf(
-    Tab("home", R.string.tab_home, Icons.Filled.Home),
-    Tab("transactions", R.string.tab_transactions, Icons.AutoMirrored.Filled.List),
-    Tab("insights", R.string.tab_insights, insightsIcon),
-    Tab("budgets", R.string.tab_budgets, budgetsIcon),
-    Tab("more", R.string.tab_more, Icons.Filled.Menu),
+    Tab("home", R.string.tab_home, Icons.Rounded.Home, Icons.Outlined.Home),
+    Tab("transactions", R.string.tab_transactions, Icons.AutoMirrored.Rounded.ReceiptLong, Icons.AutoMirrored.Outlined.ReceiptLong),
+    Tab("insights", R.string.tab_insights, Icons.Rounded.Insights, Icons.Outlined.Insights),
+    Tab("budgets", R.string.tab_budgets, Icons.Rounded.PieChart, Icons.Outlined.PieChart),
+    Tab("more", R.string.tab_more, Icons.Rounded.Menu, Icons.Rounded.Menu),
 )
+
+private val tabRoutes = tabs.map { it.route }.toSet()
+
+/** Moving between two tabs cross-fades; opening and closing a sub-screen slides a short way sideways. */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.tabSwitch() =
+    initialState.destination.route in tabRoutes && targetState.destination.route in tabRoutes
 
 fun NavHostController.goToTab(route: String) = navigate(route) {
     popUpTo(graph.findStartDestination().id) { saveState = true }
@@ -246,42 +276,83 @@ fun AppScaffold(data: AppData, vm: MainViewModel) {
         }
     }
 
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbar) },
-        bottomBar = {
-            if (onTab) {
-                NavigationBar {
-                    tabs.forEach { tab ->
-                        NavigationBarItem(
-                            selected = route == tab.route, onClick = { nav.goToTab(tab.route) },
-                            icon = { Icon(tab.icon, null) }, label = { Text(t(tab.label), maxLines = 1) },
-                        )
-                    }
+    // Navigation bar on phones, navigation rail from 600dp of width.
+    val wide = LocalConfiguration.current.screenWidthDp >= 600
+    val canAdd = onTab && route != "more"
+    val addLabel = t(R.string.add_transaction)
+
+    Row(Modifier.fillMaxSize()) {
+        if (wide && onTab) {
+            NavigationRail(
+                header = {
+                    if (canAdd) FloatingActionButton(onClick = { vm.editing = Editing() }) { Icon(Icons.Rounded.Add, addLabel) }
+                },
+            ) {
+                tabs.forEach { tab ->
+                    val selected = route == tab.route
+                    NavigationRailItem(
+                        selected = selected, onClick = { nav.goToTab(tab.route) },
+                        icon = { Icon(if (selected) tab.selectedIcon else tab.icon, null) }, label = { Text(t(tab.label), maxLines = 1) },
+                    )
                 }
             }
-        },
-        floatingActionButton = {
-            if (onTab && route != "more") {
-                FloatingActionButton(onClick = { vm.editing = Editing() }) { Icon(Icons.Filled.Add, t(R.string.add_transaction)) }
+        }
+        Scaffold(
+            modifier = Modifier.weight(1f),
+            snackbarHost = { SnackbarHost(snackbar) },
+            bottomBar = {
+                if (!wide && onTab) {
+                    NavigationBar {
+                        tabs.forEach { tab ->
+                            val selected = route == tab.route
+                            NavigationBarItem(
+                                selected = selected, onClick = { nav.goToTab(tab.route) },
+                                icon = { Icon(if (selected) tab.selectedIcon else tab.icon, null) }, label = { Text(t(tab.label), maxLines = 1) },
+                            )
+                        }
+                    }
+                }
+            },
+            floatingActionButton = {
+                if (!wide && canAdd) {
+                    ExtendedFloatingActionButton(onClick = { vm.editing = Editing() }, icon = { Icon(Icons.Rounded.Add, null) }, text = { Text(addLabel) })
+                }
+            },
+        ) { padding ->
+            NavHost(
+                nav, startDestination = "home",
+                // Sub-screens bring their own scaffold; tabs sit inside this one.
+                modifier = if (onTab) Modifier.padding(padding).consumeWindowInsets(padding) else Modifier,
+                enterTransition = {
+                    if (tabSwitch()) fadeIn(tween(Motion.SHORT))
+                    else slideInHorizontally(tween(Motion.MEDIUM, easing = Motion.EmphasizedDecelerate)) { it / 8 } + fadeIn(tween(Motion.SHORT))
+                },
+                exitTransition = { fadeOut(tween(Motion.QUICK)) },
+                popEnterTransition = {
+                    if (tabSwitch()) fadeIn(tween(Motion.SHORT))
+                    else slideInHorizontally(tween(Motion.MEDIUM, easing = Motion.EmphasizedDecelerate)) { -it / 8 } + fadeIn(tween(Motion.SHORT))
+                },
+                popExitTransition = {
+                    if (tabSwitch()) fadeOut(tween(Motion.QUICK))
+                    else slideOutHorizontally(tween(Motion.SHORT, easing = Motion.EmphasizedAccelerate)) { it / 8 } + fadeOut(tween(Motion.QUICK))
+                },
+            ) {
+                composable("home") { HomeScreen(data, vm, nav) }
+                composable("transactions") { TransactionsScreen(data, vm) }
+                composable("insights") { InsightsScreen(data, vm, nav) }
+                composable("budgets") { BudgetsScreen(data, vm) }
+                composable("more") { MoreScreen(data, vm, nav) }
+                composable("accounts") { AccountsScreen(data, vm, nav::popBackStack) }
+                composable("categories") { CategoriesScreen(data, vm, nav::popBackStack) }
+                composable("recurring") { RecurringScreen(data, vm, nav::popBackStack) }
+                composable("capture") { CaptureScreen(data, vm, nav::popBackStack) }
+                composable("currencies") { CurrenciesScreen(data, vm, nav::popBackStack) }
+                composable("security") { SecurityScreen(data, vm, nav::popBackStack) }
+                composable("backup") { BackupScreen(data, vm, nav::popBackStack) }
+                composable("goals") { GoalsScreen(data, vm, nav::popBackStack) }
+                composable("debts") { DebtsScreen(data, vm, nav::popBackStack) }
+                composable("privacy") { PrivacyScreen(nav::popBackStack) }
             }
-        },
-    ) { padding ->
-        NavHost(nav, startDestination = "home", modifier = Modifier.padding(if (onTab) padding else androidx.compose.foundation.layout.PaddingValues())) {
-            composable("home") { HomeScreen(data, vm, nav) }
-            composable("transactions") { TransactionsScreen(data, vm) }
-            composable("insights") { InsightsScreen(data, vm, nav) }
-            composable("budgets") { BudgetsScreen(data, vm) }
-            composable("more") { MoreScreen(data, vm, nav) }
-            composable("accounts") { AccountsScreen(data, vm, nav::popBackStack) }
-            composable("categories") { CategoriesScreen(data, vm, nav::popBackStack) }
-            composable("recurring") { RecurringScreen(data, vm, nav::popBackStack) }
-            composable("capture") { CaptureScreen(data, vm, nav::popBackStack) }
-            composable("currencies") { CurrenciesScreen(data, vm, nav::popBackStack) }
-            composable("security") { SecurityScreen(data, vm, nav::popBackStack) }
-            composable("backup") { BackupScreen(data, vm, nav::popBackStack) }
-            composable("goals") { GoalsScreen(data, vm, nav::popBackStack) }
-            composable("debts") { DebtsScreen(data, vm, nav::popBackStack) }
-            composable("privacy") { PrivacyScreen(nav::popBackStack) }
         }
     }
 

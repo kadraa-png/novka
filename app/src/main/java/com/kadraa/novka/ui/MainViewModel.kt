@@ -79,7 +79,7 @@ class MainViewModel(app: Application) : AndroidViewModel(app) {
     fun deleteWithUndo(id: Long, deletedText: String, undoText: String) = run {
         val removed = deleteTx(id)
         Notifier.cancelPrompt(getApplication(), id)
-        if (removed.isNotEmpty()) snacks.tryEmit(Snack(deletedText, undoText) { run { restoreTxs(removed) } })
+        if (removed.isNotEmpty()) snacks.tryEmit(Snack(deletedText, undoText) { this@MainViewModel.run { restoreTxs(removed) } })
     }
 
     fun openTx(id: Long) = viewModelScope.launch {

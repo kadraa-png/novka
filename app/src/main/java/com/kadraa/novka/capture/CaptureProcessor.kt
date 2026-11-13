@@ -147,7 +147,7 @@ class CaptureProcessor(private val repo: Repository, private val cashAccountName
         repo.changed()
         if (!ask) return null
         val ordered = (listOfNotNull(categories.firstOrNull { it.id == category }) + guesses).distinctBy { it.id }
-        Prompt(id, merchant, payment.amountMinor, payment.currency, ordered.map { it.id to "${it.icon} ${it.name}" })
+        Prompt(id, merchant, payment.amountMinor, payment.currency, ordered.map { it.id to it.name })
     }
 
     private suspend fun fill(txId: Long, payment: ParsedPayment, alsoSeenBy: Source?) {

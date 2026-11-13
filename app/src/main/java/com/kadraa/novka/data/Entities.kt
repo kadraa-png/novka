@@ -133,7 +133,7 @@ data class Captured(
 data class Goal(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val name: String,
-    val icon: String = "🎯",
+    val icon: String = "flag",
     val target: Long,
     val currency: String,
     val deadline: String? = null,

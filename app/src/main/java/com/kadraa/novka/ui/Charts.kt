@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -45,7 +44,7 @@ data class Slice(val label: String, val value: Long, val colour: Color)
 fun Legend(items: List<Pair<String, Color>>, modifier: Modifier = Modifier) {
     Row(modifier, verticalAlignment = Alignment.CenterVertically) {
         items.forEach { (label, colour) ->
-            Box(Modifier.size(10.dp).background(colour, RoundedCornerShape(2.dp)))
+            Box(Modifier.size(12.dp).background(colour, MaterialTheme.shapes.extraSmall))
             Spacer(Modifier.width(6.dp))
             Text(label, style = MaterialTheme.typography.labelMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             Spacer(Modifier.width(16.dp))

@@ -13,6 +13,13 @@ The last successful build was before the UI work started: the 38 domain unit tes
 a test run, because the build is broken: the test fixtures were edited to replace real
 card digits with made-up ones, and the default category colours changed.
 
+Update 2026-11-13: the existing UI was redesigned to Material Design 3 (see "Design
+rules" below). With throwaway stubs for the missing screens and placeholder strings,
+`:app:compileDebugKotlin` and `:app:testDebugUnitTest` both passed, so Room, the
+repository and everything else under "Written" now compile. The stubs were deleted
+again; the project still does not build until the screens and strings exist. Nothing
+has been looked at on a device.
+
 ### Written
 
 | Area | Files | State |
@@ -37,7 +44,7 @@ the first time the build gets that far.
 ### Not written
 
 1. **String resources.** `res/values/strings.xml` (English) and
-   `res/values-bs/strings.xml` (Bosnian) do not exist. The code already uses 57 string
+   `res/values-bs/strings.xml` (Bosnian) do not exist. The code already uses 59 string
    names. List them with:
 
    ```sh
@@ -162,7 +169,11 @@ Made during the build; the owner has not reviewed these:
   `open.er-api.com` first, the `@fawazahmed0/currency-api` CDN as fallback. Both are
   free and need no key.
 - **One view model** (`MainViewModel`) shared by all screens, instead of one per screen.
-- **Category icons are emoji**, so no icon library is needed and users can pick any.
+- **Category icons are Material icons, not emoji** (owner's request, 2026-11-13).
+  `Category.icon` and `Goal.icon` hold a key such as `shopping_cart`; `ui/Icons.kt`
+  maps keys to vectors and is the list an icon picker should offer. This added the
+  `material-icons-extended` dependency, which makes debug builds larger; release
+  builds strip the unused icons.
 - **A transaction's amount is always in its account's currency.** A payment made in
   another currency is converted, and what was actually charged is kept in
   `originalAmount` / `originalCurrency`. The spec said to save it in the paid currency,
@@ -174,6 +185,26 @@ Made during the build; the owner has not reviewed these:
 - **The widget hides amounts** while the app lock is on.
 - A transaction saved when no exchange rate is known gets rate 0 and is completed the
   next time rates are fetched (`Repository.repairMissingRates`).
+
+## Design rules
+
+The owner wants every screen to follow Material Design 3, with no emoji anywhere and
+quick animations. The screens still to be written should keep to what the existing
+ones do:
+
+- Colours only from `MaterialTheme.colorScheme` (dynamic colour on Android 12+, the
+  teal scheme in `ui/Theme.kt` below that). The only stored colours are the category
+  and account swatches. Shapes from `MaterialTheme.shapes`, text styles from
+  `MaterialTheme.typography`; no hand-set font sizes or weights.
+- Icons from `Icons.Rounded` (outlined for unselected navigation items). Use
+  `CategoryBadge` / `IconBadge` from `ui/Common.kt` for leading icons.
+- Rows are `ListItem`s; sections are grouped in `SectionCard` (`ui/HomeScreen.kt`).
+- Animation durations and easing come from `Motion` in `ui/Theme.kt` (100 to 200 ms).
+  Screen transitions are set once on the `NavHost` in `ui/MainActivity.kt`.
+- Navigation bar below 600dp of width, navigation rail above. Scrolling content is
+  capped at 840dp wide.
+- The widget takes its colours from `res/values*/colors.xml`, which follow the
+  wallpaper on Android 12+.
 
 ## Code map
 

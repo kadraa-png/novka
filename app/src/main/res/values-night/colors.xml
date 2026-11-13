@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="widget_surface">#1A1A19</color>
-    <color name="widget_text">#F0EFEC</color>
-    <color name="widget_text_secondary">#C3C2B7</color>
+    <color name="widget_surface">#0E1513</color>
+    <color name="widget_text">#DDE4E1</color>
+    <color name="widget_text_secondary">#BEC9C6</color>
+    <color name="widget_accent">#005048</color>
+    <color name="widget_on_accent">#9EF2E4</color>
 </resources>
